@@ -1,0 +1,39 @@
+@startuml motivation
+skinparam backgroundColor #FEFEFE
+skinparam shadowing false
+skinparam defaultFontSize 15
+skinparam defaultFontName "Microsoft YaHei"
+skinparam rectangleBorderThickness 1.5
+skinparam arrowThickness 1.5
+skinparam rectangle {
+    RoundCorner 12
+}
+
+' ========== 挑战层（顶部三列） ==========
+rectangle "**挑战1: 裂缝细长低对比度**\n背景复杂，细小裂缝易漏检" as C1 #FFF8E1;line:#D4A017
+rectangle "**挑战2: 噪声与模糊退化**\n实际采集图像质量参差不齐" as C2 #FFF8E1;line:#D4A017
+rectangle "**挑战3: 标注数据有限**\n人工标注成本高、样本不足" as C3 #FFF8E1;line:#D4A017
+
+' ========== 方案层（中间三列） ==========
+rectangle "**RCBAM**\n**注意力模块**\n通道+空间双重注意力\n残差连接保留细节" as S1 #E8F5E9;line:#2E7D32
+rectangle "**加噪模糊**\n**数据增强**\n高斯模糊+高斯噪声\n按比例混合构建退化集" as S2 #E8F5E9;line:#2E7D32
+rectangle "**Multi-View**\n**自监督损失**\n双视图逐尺度余弦距离\n特征一致性约束" as S3 #E8F5E9;line:#2E7D32
+
+' ========== 目标层（底部） ==========
+rectangle "**鲁棒裂缝检测模型**" as G #FFCCBC;line:#E64A19
+
+' ========== 挑战 → 方案 ==========
+C1 -down-> S1
+C2 -down-> S2
+C3 -down-> S3
+
+' ========== 方案 → 目标 ==========
+S1 -down-> G
+S2 -down-> G
+S3 -down-> G
+
+' ========== 方案间交互（虚线） ==========
+S1 .[#7B1FA2,dashed].> S3 : <color:#7B1FA2><b>增强特征表达</b></color>
+S2 .[#7B1FA2,dashed].> S3 : <color:#7B1FA2><b>正则化互补</b></color>
+
+@enduml
