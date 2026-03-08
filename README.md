@@ -57,7 +57,7 @@ YOLOv8-Crack-Detection/
 
 1. 克隆仓库：
    ```bash
-   git clone https://github.com/xudongww/YOLOV8_Attention_Crack_Detection
+   git clone <仓库地址>
    cd YOLOv8-Crack-Detection
    ```
 
