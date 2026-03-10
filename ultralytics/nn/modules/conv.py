@@ -428,9 +428,9 @@ class ShuffleAttention(nn.Module):
         return out
 
 
-class ResBlock_CBAM(nn.Module):
+class RCBAM(nn.Module):
     def __init__(self, in_places, places, stride=1, downsampling=False, expansion=1):
-        super(ResBlock_CBAM, self).__init__()
+        super(RCBAM, self).__init__()
         self.expansion = expansion
         self.downsampling = downsampling
 

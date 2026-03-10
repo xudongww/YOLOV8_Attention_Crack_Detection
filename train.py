@@ -8,7 +8,7 @@ Usage:
     python train.py --semi --unlabeled_dir /path/to/unlabeled/images [--semi_rounds 2] [--semi_conf 0.7]
 
 Available attention modules (via --attention):
-    ResBlock_CBAM - Residual Block with CBAM
+    RCBAM - Residual Block with CBAM
     none      - Standard YOLOv8 without attention (default)
 """
 
@@ -27,7 +27,7 @@ from ultralytics import YOLO
 # Available attention module YAML configs
 ATTENTION_MODELS = {
     "none": "yolov8n.pt",          # Standard YOLOv8 without attention
-    "ResBlock_CBAM": "yolov8_ResBlock_CBAM.yaml",  # Residual Block with CBAM
+    "RCBAM": "yolov8_RCBAM.yaml",  # Residual Block with CBAM
 }
 
 
@@ -88,12 +88,12 @@ def parse_args():
     parser.add_argument(
         "--attention",
         type=str,
-        default="ResBlock_CBAM",
+        default="RCBAM",
         choices=list(ATTENTION_MODELS.keys()),
         help=f"Attention module to use: {list(ATTENTION_MODELS.keys())} (default: none)",
     )
-    # clean_data_ResBlock_CBAM
-    parser.add_argument("--name", type=str, default="clean_data_ResBlock_CBAM_multi_view_0.1", help="Training run name")
+    # clean_data_RCBAM
+    parser.add_argument("--name", type=str, default="clean_data_RCBAM_multi_view_0.1", help="Training run name")
     parser.add_argument("--lr", type=float, default=0.01, help="Initial learning rate (default: 0.01)")
     parser.add_argument("--batch", type=int, default=16, help="Batch size for training (default: 16)")
     parser.add_argument(

@@ -83,7 +83,7 @@ class Model:
             from ultralytics.hub.session import HUBTrainingSession
             self.session = HUBTrainingSession(model)
             model = self.session.model_file
-
+ 
         # Load or create new YOLO model
         suffix = Path(model).suffix
         if not suffix and Path(model).stem in GITHUB_ASSET_STEMS:

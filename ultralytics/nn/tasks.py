@@ -11,7 +11,7 @@ from ultralytics.nn.modules import (AIFI, C1, C2, C3, C3TR, SPP, SPPF, Bottlenec
                                     Classify, Concat, Conv, Conv2, ConvTranspose, Detect, DWConv, DWConvTranspose2d,
                                     Focus, GhostBottleneck, GhostConv, HGBlock, HGStem, Pose, RepC3, RepConv,
                                     RTDETRDecoder, Segment,
-                                    GAM_Attention,GCT,ShuffleAttention,ResBlock_CBAM,ECAAttention,MHSA,GlobalContext,GatherExcite)
+                                    GAM_Attention,GCT,ShuffleAttention,RCBAM,ECAAttention,MHSA,GlobalContext,GatherExcite)
 
 from ultralytics.utils import DEFAULT_CFG_DICT, DEFAULT_CFG_KEYS, LOGGER, colorstr, emojis, yaml_load
 from ultralytics.utils.checks import check_requirements, check_suffix, check_yaml
@@ -19,7 +19,7 @@ from ultralytics.utils.loss import v8ClassificationLoss, v8DetectionLoss, v8Pose
 from ultralytics.utils.plotting import feature_visualization
 from ultralytics.utils.torch_utils import (fuse_conv_and_bn, fuse_deconv_and_bn, initialize_weights, intersect_dicts,
                                            make_divisible, model_info, scale_img, time_sync)
-
+import pdb
 try:
     import thop
 except ImportError:
@@ -78,6 +78,7 @@ class BaseModel(nn.Module):
         y, dt = [], []  # outputs
         inter_scale_feats = None
         for m in self.model:
+            pdb.set_trace()
             if m.f != -1:  # if not from previous layer
                 x = y[m.f] if isinstance(m.f, int) else [x if j == -1 else y[j] for j in m.f]  # from earlier layers
             # Capture the input features of the Detect head for inter-scale consistency loss
@@ -215,7 +216,7 @@ class BaseModel(nn.Module):
 
         Only Gaussian blur and Gaussian noise are used to match the degradation
         types in the offline training-set augmentation pipeline.
-
+ 
         Args:
             img: (B, C, H, W) float tensor in [0, 1]
         Returns:
@@ -224,10 +225,13 @@ class BaseModel(nn.Module):
         import random
         import torch.nn.functional as F
         x = img
-        # Random Gaussian blur
-        if random.random() > 0.5:
-            ksize = random.choice([3, 5, 7])  # random odd kernel size
-            sigma = random.uniform(0.5, 2.0)
+        # Randomly choose one type of augmentation (blur or noise)
+        augmentation_type = random.choice(['blur', 'noise'])
+        
+        if augmentation_type == 'blur':
+            # Gaussian blur with half the strength of the script
+            ksize = 7  # fixed kernel size (half of script's 13, adjusted to odd)
+            sigma = random.uniform(10.0, 15.0)  # half strength: 22.36/2 ≈ 11.18, range 10-15
             # Build 1-D Gaussian kernel
             coords = torch.arange(ksize, dtype=x.dtype, device=x.device) - ksize // 2
             g = torch.exp(-coords ** 2 / (2 * sigma ** 2))
@@ -240,10 +244,11 @@ class BaseModel(nn.Module):
             pad_w = ksize // 2
             x = F.conv2d(F.pad(x, [0, 0, pad_h, pad_h], mode='reflect'), k_h, groups=C)
             x = F.conv2d(F.pad(x, [pad_w, pad_w, 0, 0], mode='reflect'), k_w, groups=C)
-        # Random Gaussian noise
-        if random.random() > 0.5:
-            noise_std = random.uniform(0.01, 0.05)
+        else:
+            # Gaussian noise with half the strength of the script
+            noise_std = random.uniform(20.0, 25.0)  # half strength: 22.36, range 20-25
             x = x + torch.randn_like(x) * noise_std
+        
         x = x.clamp(0.0, 1.0)
         return x
 
@@ -752,6 +757,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
     layers, save, c2 = [], [], ch[-1]  # layers, savelist, ch out
     for i, (f, n, m, args) in enumerate(d['backbone'] + d['head']):  # from, number, module, args
         m = getattr(torch.nn, m[3:]) if 'nn.' in m else globals()[m]  # get module
+        # pdb.set_trace()
         for j, a in enumerate(args):
             if isinstance(a, str):
                 with contextlib.suppress(ValueError):
@@ -760,7 +766,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
         n = n_ = max(round(n * depth), 1) if n > 1 else n  # depth gain
         if m in (Classify, Conv, ConvTranspose, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, Focus,
                  BottleneckCSP, C1, C2, C2f, C3, C3TR, C3Ghost, nn.ConvTranspose2d, DWConvTranspose2d, C3x, RepC3,
-                 GAM_Attention,GCT,ResBlock_CBAM,GlobalContext,GatherExcite):
+                 GAM_Attention,GCT,RCBAM,GlobalContext,GatherExcite):
             c1, c2 = ch[f], args[0]
             if c2 != nc:  # if c2 not equal to number of classes (i.e. for Classify() output)
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
@@ -817,6 +823,7 @@ def parse_model(d, ch, verbose=True):  # model_dict, input_channels(3)
         if i == 0:
             ch = []
         ch.append(c2)
+    # pdb.set_trace()
     return nn.Sequential(*layers), sorted(save)
 
 

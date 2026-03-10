@@ -49,8 +49,8 @@ if __name__ == "__main__":
     output_path = "00792_jpg.rf.4006a8b7ae7585ab0522270c8a285e24_motion.jpg"
 
     # 选择退化类型
-    # degraded = degrade_image(input_path, mode='gaussian', mean=0, sigma=70)
-    degraded = degrade_image(input_path, mode='motion', kernel_size=20, angle=30)
+    degraded = degrade_image(input_path, mode='gaussian', mean=0, sigma=100)
+    # degraded = degrade_image(input_path, mode='motion', kernel_size=20, angle=30)
 
     cv2.imwrite(output_path, degraded)
     print(f"退化图像已保存到 {output_path}")

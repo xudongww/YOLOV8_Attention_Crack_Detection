@@ -8,7 +8,7 @@ Usage:
 Available attention modules (via --attention):
     GAM       - Global Attention Module
     ECA       - Efficient Channel Attention
-    ResBlock_CBAM - Residual Block with CBAM
+    RCBAM - Residual Block with CBAM
     SA        - Shuffle Attention
     none      - Standard YOLOv8 without attention (default)
 """
@@ -49,7 +49,7 @@ ATTENTION_MODELS = {
     "none": "yolov8n.pt",          # Standard YOLOv8 without attention
     "GAM": "yolov8_GAM.yaml",      # Global Attention Module
     "ECA": "yolov8_ECA.yaml",      # Efficient Channel Attention
-    "ResBlock_CBAM": "yolov8_ResBlock_CBAM.yaml",  # Residual Block with CBAM
+    "RCBAM": "yolov8_RCBAM.yaml",  # Residual Block with CBAM
     "SA": "yolov8_SA.yaml",        # Shuffle Attention
 }
 
@@ -59,7 +59,7 @@ def parse_args():
     parser.add_argument(
         "--model",
         type=str,
-        default='/apdcephfs_fsgm/share_304156246/xmudongwang/codebase/zq/YOLOv8-Crack-Detection/results_attention/degraded_data_ResBlock_CBAM_multi_view_0.1/weights/best.pt',
+        default='/apdcephfs_fsgm/share_304156246/xmudongwang/codebase/zq/YOLOv8-Crack-Detection/results_attention/degraded_data_RCBAM_multi_view_0.1/weights/best.pt',
         help="Path to trained model weights (default: auto-detected from --attention)",
     )
     parser.add_argument(
@@ -84,7 +84,7 @@ def parse_args():
     parser.add_argument(
         "--name-prefix",
         type=str,
-        default='eval_degraded_data_ResBlock_CBAM_multi_view_0.1',
+        default='eval_degraded_data_RCBAM_multi_view_0.1',
         help="Name prefix for test result directories (default: auto from --attention)",
     )
     return parser.parse_args()
