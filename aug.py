@@ -45,12 +45,29 @@ def degrade_image(image_path, mode='gaussian', **kwargs):
 
 # ===== 示例使用 =====
 if __name__ == "__main__":
-    input_path = "/apdcephfs_fsgm/share_304156246/xmudongwang/codebase/zq/YOLOv8-Crack-Detection/test_datasets/clean/valid/images/00792_jpg.rf.4006a8b7ae7585ab0522270c8a285e24.jpg"  # 输入图片路径
-    output_path = "00792_jpg.rf.4006a8b7ae7585ab0522270c8a285e24_motion.jpg"
+    import os
 
-    # 选择退化类型
-    degraded = degrade_image(input_path, mode='gaussian', mean=0, sigma=100)
-    # degraded = degrade_image(input_path, mode='motion', kernel_size=20, angle=30)
+    input_path = "./zq/YOLOv8-Crack-Detection/test_datasets/clean/valid/images/00792_jpg.rf.4006a8b7ae7585ab0522270c8a285e24.jpg"
+    output_dir = "degraded_outputs"
+    os.makedirs(output_dir, exist_ok=True)
 
-    cv2.imwrite(output_path, degraded)
-    print(f"退化图像已保存到 {output_path}")
+    # Get the base filename without extension
+    base_name = os.path.splitext(os.path.basename(input_path))[0]
+
+    # Generate 5 gaussian noise images with sigma from 20 to 200 (evenly spaced)
+    gaussian_sigmas = np.linspace(20, 100, 5, dtype=int)  # [20, 65, 110, 155, 200]
+    for sigma in gaussian_sigmas:
+        degraded = degrade_image(input_path, mode='gaussian', mean=0, sigma=int(sigma))
+        out_path = os.path.join(output_dir, f"{base_name}_gaussian_sigma{int(sigma)}.jpg")
+        cv2.imwrite(out_path, degraded)
+        print(f"[Gaussian] sigma={int(sigma):>3d} -> {out_path}")
+
+    # Generate 5 motion blur images with kernel_size from 20 to 200 (evenly spaced)
+    motion_kernels = np.linspace(10, 50, 5, dtype=int)  # [20, 65, 110, 155, 200]
+    for ks in motion_kernels:
+        degraded = degrade_image(input_path, mode='motion', kernel_size=int(ks), angle=0)
+        out_path = os.path.join(output_dir, f"{base_name}_motion_ks{int(ks)}.jpg")
+        cv2.imwrite(out_path, degraded)
+        print(f"[Motion]   kernel_size={int(ks):>3d} -> {out_path}")
+
+    print(f"\nAll degraded images saved to '{output_dir}/' directory.")

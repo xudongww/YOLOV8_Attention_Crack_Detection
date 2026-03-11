@@ -59,7 +59,7 @@ def parse_args():
     parser.add_argument(
         "--model",
         type=str,
-        default='/apdcephfs_fsgm/share_304156246/xmudongwang/codebase/zq/YOLOv8-Crack-Detection/results_attention/degraded_data_RCBAM_multi_view_0.1/weights/best.pt',
+        default='./zq/YOLOv8-Crack-Detection/results_attention/degraded_data_RCBAM_multi_view_0.1/weights/best.pt',
         help="Path to trained model weights (default: auto-detected from --attention)",
     )
     parser.add_argument(

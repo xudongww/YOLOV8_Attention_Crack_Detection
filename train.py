@@ -73,7 +73,7 @@ def parse_args():
     parser.add_argument(
         "--dataset",
         type=str,
-        # default='/apdcephfs_fsgm/share_304156246/xmudongwang/codebase/zq/YOLOv8-Crack-Detection/training_cracks/degraded_dataset/data.yaml',
+        # default='./zq/YOLOv8-Crack-Detection/training_cracks/degraded_dataset/data.yaml',
         default=None,
         help="Path to data.yaml (default: <project_root>/training_cracks/DawgSurfaceCracks/data.yaml)",
     )
